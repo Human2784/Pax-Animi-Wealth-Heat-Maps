@@ -21,7 +21,8 @@
     return `background:${color}`;
   }
   function yearRows(f) {
-    return Object.keys(f.returns || {}).sort().map(d => ({
+    const key = d => d.slice(6) + d.slice(3, 5) + d.slice(0, 2);
+    return Object.keys(f.returns || {}).sort((a, b) => key(a).localeCompare(key(b))).map(d => ({
       key: d === "30/09/2026" ? "2026 YTD" : d.slice(6),
       date: d,
       value: f.returns[d]
@@ -64,6 +65,7 @@
 
   let sortKey = null;
   let sortDir = -1;
+  let chart = null;
 
   function bindSort(draw) {
     const table = $("grid");
@@ -127,10 +129,6 @@
     bindSort(drawRolling);
   }
 
-  function axisPct(value) {
-    return value + "%";
-  }
-  const pctScale = { ticks: { callback: axisPct } };
   function drawCagr() {
     let rows = selectedFunds().slice().sort((a, b) => b.cagr.cagr - a.cagr.cagr);
     if (sortKey === "name") rows.sort((a, b) => a.name.localeCompare(b.name) * sortDir);
@@ -142,7 +140,7 @@
         labels: rows.map(f => f.name.replace(" Portfolio","").replace(" Fund","").replace(" Trust","")),
         datasets: [{ label: "CAGR since launch", data: rows.map(f => f.cagr.cagr), backgroundColor: "#1f4d3a" }]
       },
-      options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } }, scales: { x: pctScale } }
+      options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } } }
     });
     const head = `<thead><tr><th class="left" data-k="name">Fund</th><th class="left" data-k="launch">Launch</th><th data-k="years">Years</th><th data-k="launchPrice">Launch price</th><th data-k="price">Price now</th><th data-k="cagr">CAGR</th></tr></thead>`;
     const body = rows.map(f => `<tr>${nameCell(f)}<td class="left">${f.cagr.launch}</td><td>${f.cagr.years.toFixed(2)}</td><td>£${f.cagr.launchPrice.toFixed(2)}</td><td>£${f.cagr.price.toFixed(2)}</td><td class="${cls(f.cagr.cagr)}">${pct(f.cagr.cagr)}</td></tr>`).join("");
@@ -171,7 +169,7 @@
           { label: "Real return", data: rows.map(f => f.rpi.real), backgroundColor: rows.map(f => f.rpi.real >= 0 ? "#1f4d3a" : "#8d2f2f") }
         ]
       },
-      options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", scales: { x: pctScale } }
+      options: { responsive: true, maintainAspectRatio: false, indexAxis: "y" }
     });
     const head = `<thead><tr><th class="left" data-k="name">Fund</th><th data-k="years">Years</th><th data-k="cagr">Fund CAGR</th><th data-k="rpi">RPI</th><th data-k="real">Real return</th></tr></thead>`;
     const body = rows.map(f => `<tr>${nameCell(f)}<td>${f.rpi.years.toFixed(2)}</td><td class="${cls(f.rpi.cagr)}">${pct(f.rpi.cagr)}</td><td>${pct(f.rpi.rpi)}</td><td class="${cls(f.rpi.real)}">${pct(f.rpi.real)}</td></tr>`).join("");
@@ -199,7 +197,7 @@
         labels: rows.map(m => m.name),
         datasets: [{ label: "YTD", data: rows.map(m => m.ytd), backgroundColor: rows.map(m => m.ytd >= 0 ? "#1f4d3a" : "#8d2f2f") }]
       },
-      options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } }, scales: { x: pctScale } }
+      options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } } }
     });
     const head = `<thead><tr><th class="left" data-k="name">Market</th><th>Group</th><th>Start</th><th>Latest</th><th data-k="ytd">YTD</th></tr></thead>`;
     const body = rows.map(m => `<tr><td class="left"><span class="name">${m.name}</span><span class="meta">${m.symbol}</span></td><td class="left">${m.group}</td><td class="left">${m.startPrice}</td><td class="left">${m.endPrice}</td><td class="${cls(m.ytd)}">${pct(m.ytd)}</td></tr>`).join("");
@@ -209,6 +207,4 @@
 
   const draw = { heatmap: drawHeat, rolling: drawRolling, cagr: drawCagr, rpi: drawRpi, markets: drawMarkets }[page];
   if (page !== "markets") fillFilters();
-  ["q","house","role","group"].forEach(id => $(id)?.addEventListener("input", draw));
-  draw();
-})();
+  ["q","house","role","group"].forEach(id => $(id)?.addEventListener("input",
