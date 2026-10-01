@@ -40,7 +40,8 @@ input, select {
 .scroll { overflow: auto; max-height: 72vh; }
 table { border-collapse: collapse; font-size: 13px; min-width: 100%; }
 th, td { padding: 7px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; text-align: right; }
-th:first-child, td:first-child, th.left, td.left { text-align: left; position: sticky; left: 0; background: var(--card); }
+th:first-child, td:first-child { text-align: left; position: sticky; left: 0; background: var(--card); }
+th.left, td.left { text-align: left; }
 thead th { position: sticky; top: 0; background: #f3efe6; z-index: 1; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); cursor: pointer; }
 thead th:first-child { z-index: 2; }
 tbody tr:hover td { background: #f7f4ee; }
