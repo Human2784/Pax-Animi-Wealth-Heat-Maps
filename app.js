@@ -20,17 +20,12 @@
       : `rgba(141, 47, 47, ${0.12 + -t * 0.55})`;
     return `background:${color}`;
   }
-  function yearsOf(f) {
-    const dates = Object.keys(f.prices).sort();
-    const out = [];
-    for (let i = 1; i < dates.length; i++) {
-      const prev = f.prices[dates[i - 1]];
-      const cur = f.prices[dates[i]];
-      const label = dates[i].slice(6);
-      const ytd = dates[i] === "30/09/2026";
-      out.push({ key: ytd ? "2026 YTD" : label, ytd, value: (cur / prev - 1) * 100 });
-    }
-    return out;
+  function yearRows(f) {
+    return Object.keys(f.returns || {}).sort().map(d => ({
+      key: d === "30/09/2026" ? "2026 YTD" : d.slice(6),
+      date: d,
+      value: f.returns[d]
+    }));
   }
   function avg(rows) {
     if (!rows.length) return null;
@@ -85,7 +80,7 @@
   }
 
   function drawHeat() {
-    const rows = selectedFunds().map(f => ({ f, years: yearsOf(f), avg: avg(yearsOf(f)) }));
+    const rows = selectedFunds().map(f => ({ f, years: yearRows(f), avg: avg(yearRows(f)) }));
     const keys = [...new Set(rows.flatMap(r => r.years.map(y => y.key)))];
     if (sortKey) {
       rows.sort((a, b) => {
@@ -132,9 +127,12 @@
     bindSort(drawRolling);
   }
 
-  let chart;
+  function axisPct(value) {
+    return value + "%";
+  }
+  const pctScale = { ticks: { callback: axisPct } };
   function drawCagr() {
-    let rows = selectedFunds().slice().sort((a, b) => a.cagr.cagr - b.cagr.cagr);
+    let rows = selectedFunds().slice().sort((a, b) => b.cagr.cagr - a.cagr.cagr);
     if (sortKey === "name") rows.sort((a, b) => a.name.localeCompare(b.name) * sortDir);
     else if (sortKey) rows.sort((a, b) => ((a.cagr[sortKey] ?? -999) - (b.cagr[sortKey] ?? -999)) * sortDir);
     if (chart) chart.destroy();
@@ -144,16 +142,16 @@
         labels: rows.map(f => f.name.replace(" Portfolio","").replace(" Fund","").replace(" Trust","")),
         datasets: [{ label: "CAGR since launch", data: rows.map(f => f.cagr.cagr), backgroundColor: "#1f4d3a" }]
       },
-      options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } } }
+      options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } }, scales: { x: pctScale } }
     });
-    const head = `<thead><tr><th class="left" data-k="name">Fund</th><th data-k="launch">Launch</th><th data-k="years">Years</th><th data-k="launchPrice">Launch price</th><th data-k="price">Price now</th><th data-k="cagr">CAGR</th></tr></thead>`;
+    const head = `<thead><tr><th class="left" data-k="name">Fund</th><th class="left" data-k="launch">Launch</th><th data-k="years">Years</th><th data-k="launchPrice">Launch price</th><th data-k="price">Price now</th><th data-k="cagr">CAGR</th></tr></thead>`;
     const body = rows.map(f => `<tr>${nameCell(f)}<td class="left">${f.cagr.launch}</td><td>${f.cagr.years.toFixed(2)}</td><td>£${f.cagr.launchPrice.toFixed(2)}</td><td>£${f.cagr.price.toFixed(2)}</td><td class="${cls(f.cagr.cagr)}">${pct(f.cagr.cagr)}</td></tr>`).join("");
     $("grid").innerHTML = head + `<tbody>${body}</tbody>`;
     bindSort(drawCagr);
   }
 
   function drawRpi() {
-    let rows = selectedFunds().slice().sort((a, b) => a.rpi.real - b.rpi.real);
+    let rows = selectedFunds().slice().sort((a, b) => b.rpi.real - a.rpi.real);
     if (sortKey) {
       rows.sort((a, b) => {
         const av = sortKey === "name" ? a.name : a.rpi[sortKey];
@@ -173,7 +171,7 @@
           { label: "Real return", data: rows.map(f => f.rpi.real), backgroundColor: rows.map(f => f.rpi.real >= 0 ? "#1f4d3a" : "#8d2f2f") }
         ]
       },
-      options: { responsive: true, maintainAspectRatio: false, indexAxis: "y" }
+      options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", scales: { x: pctScale } }
     });
     const head = `<thead><tr><th class="left" data-k="name">Fund</th><th data-k="years">Years</th><th data-k="cagr">Fund CAGR</th><th data-k="rpi">RPI</th><th data-k="real">Real return</th></tr></thead>`;
     const body = rows.map(f => `<tr>${nameCell(f)}<td>${f.rpi.years.toFixed(2)}</td><td class="${cls(f.rpi.cagr)}">${pct(f.rpi.cagr)}</td><td>${pct(f.rpi.rpi)}</td><td class="${cls(f.rpi.real)}">${pct(f.rpi.real)}</td></tr>`).join("");
@@ -201,7 +199,7 @@
         labels: rows.map(m => m.name),
         datasets: [{ label: "YTD", data: rows.map(m => m.ytd), backgroundColor: rows.map(m => m.ytd >= 0 ? "#1f4d3a" : "#8d2f2f") }]
       },
-      options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } } }
+      options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } }, scales: { x: pctScale } }
     });
     const head = `<thead><tr><th class="left" data-k="name">Market</th><th>Group</th><th>Start</th><th>Latest</th><th data-k="ytd">YTD</th></tr></thead>`;
     const body = rows.map(m => `<tr><td class="left"><span class="name">${m.name}</span><span class="meta">${m.symbol}</span></td><td class="left">${m.group}</td><td class="left">${m.startPrice}</td><td class="left">${m.endPrice}</td><td class="${cls(m.ytd)}">${pct(m.ytd)}</td></tr>`).join("");
