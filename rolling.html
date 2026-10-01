@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pax Animi Wealth — rolling performance</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="rolling">
+  <header><div class="wrap">
+    <div class="kicker">Pax Animi Wealth · snapshot 1 October 2026</div>
+    <h1>Rolling performance</h1>
+    <p class="lede">Total return for 3 months, 6 months and 1 year. Annualised for 3, 5 and 10 years. A period is blank when the share class had not launched.</p>
+    <nav>
+      <a href="index.html">Heat map</a>
+      <a href="rolling.html" class="active">Rolling</a>
+      <a href="since-launch.html">Since launch</a>
+      <a href="real-return.html">Real return</a>
+      <a href="markets.html">Markets</a>
+    </nav>
+  </div></header>
+  <main>
+    <div class="toolbar">
+      <input id="q" placeholder="Search fund or ISIN" />
+      <select id="house"><option value="">All houses</option></select>
+      <select id="role"><option value="">All roles</option></select>
+    </div>
+    <div class="card">
+      <div class="scroll"><table id="grid"></table></div>
+      <p class="note">Taken from the stored rolling sheet. This will not match the 30 September heat map, because the windows end on 1 October.</p>
+    </div>
+  </main>
+  <footer>Internal reference for Pax Animi Wealth Ltd. Not a recommendation. Past performance is not a guide to future returns.</footer>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

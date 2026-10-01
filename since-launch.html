@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pax Animi Wealth — since launch</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body data-page="cagr">
+  <header><div class="wrap">
+    <div class="kicker">Pax Animi Wealth · 30 September 2026</div>
+    <h1>Growth since launch</h1>
+    <p class="lede">Annualised return from share-class launch price to the latest end-of-month price. A short-lived fund can sit next to a fifteen-year fund. Years since launch is there so that does not get missed.</p>
+    <nav>
+      <a href="index.html">Heat map</a>
+      <a href="rolling.html">Rolling</a>
+      <a href="since-launch.html" class="active">Since launch</a>
+      <a href="real-return.html">Real return</a>
+      <a href="markets.html">Markets</a>
+    </nav>
+  </div></header>
+  <main>
+    <div class="toolbar">
+      <input id="q" placeholder="Search fund or ISIN" />
+      <select id="house"><option value="">All houses</option></select>
+      <select id="role"><option value="">All roles</option></select>
+    </div>
+    <div class="card"><div class="chart-box"><canvas id="chart"></canvas></div></div>
+    <div class="card">
+      <div class="scroll"><table id="grid"></table></div>
+      <p class="note">Irish-domiciled Dimensional rows use 29 September 2026. Every other row uses 30 September. This is not the inflation-adjusted view.</p>
+    </div>
+  </main>
+  <footer>Internal reference for Pax Animi Wealth Ltd. Not a recommendation. Past performance is not a guide to future returns.</footer>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

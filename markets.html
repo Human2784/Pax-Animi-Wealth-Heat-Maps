@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pax Animi Wealth — markets YTD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body data-page="markets">
+  <header><div class="wrap">
+    <div class="kicker">Pax Animi Wealth · 31 December 2025 to 30 September 2026</div>
+    <h1>Market moves, year to date</h1>
+    <p class="lede">Indices, commodities and bitcoin. Separate from the fund list. Moves are in each market’s own currency, so a US oil price is not a sterling return.</p>
+    <nav>
+      <a href="index.html">Heat map</a>
+      <a href="rolling.html">Rolling</a>
+      <a href="since-launch.html">Since launch</a>
+      <a href="real-return.html">Real return</a>
+      <a href="markets.html" class="active">Markets</a>
+    </nav>
+  </div></header>
+  <main>
+    <div class="toolbar">
+      <input id="q" placeholder="Search market" />
+      <select id="group"><option value="">All groups</option></select>
+    </div>
+    <div class="card"><div class="chart-box"><canvas id="chart"></canvas></div>
+      <p class="note">VIX is a volatility reading, not an asset you hold. FTSE rows use 29 September, the last London session in the file.</p>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="scroll"><table id="grid"></table></div>
+    </div>
+  </main>
+  <footer>Internal reference for Pax Animi Wealth Ltd. Not a recommendation. Levels are stored month-end prints, not a live feed.</footer>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

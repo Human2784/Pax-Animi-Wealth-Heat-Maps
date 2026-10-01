@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pax Animi Wealth — fund heat map</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="heatmap">
+  <header><div class="wrap">
+    <div class="kicker">Pax Animi Wealth · month-end September 2026</div>
+    <h1>Fund heat map</h1>
+    <p class="lede">Calendar-year return from year-end price to year-end price. 2026 is year-to-date to 30 September. This page does not rank houses against each other.</p>
+    <nav>
+      <a href="index.html" class="active">Heat map</a>
+      <a href="rolling.html">Rolling</a>
+      <a href="since-launch.html">Since launch</a>
+      <a href="real-return.html">Real return</a>
+      <a href="markets.html">Markets</a>
+    </nav>
+  </div></header>
+  <main>
+    <div class="toolbar">
+      <input id="q" placeholder="Search fund or ISIN" />
+      <select id="house"><option value="">All houses</option></select>
+      <select id="role"><option value="">All roles</option></select>
+    </div>
+    <div class="card">
+      <div class="scroll"><table id="grid"></table></div>
+      <p class="note">Returns are calculated on this page from the year-end price file. A year appears only when the prior year-end price exists, so a launch-year stub is not shown. Average is the simple average of the years in that row, including 2026 YTD. Not a compound growth rate.</p>
+    </div>
+  </main>
+  <footer>Internal reference for Pax Animi Wealth Ltd. Not a recommendation. Past performance is not a guide to future returns. Prices are stored month-end values, not a live feed.</footer>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
