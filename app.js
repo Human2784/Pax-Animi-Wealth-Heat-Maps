@@ -20,13 +20,17 @@
       : `rgba(141, 47, 47, ${0.12 + -t * 0.55})`;
     return `background:${color}`;
   }
-  function yearRows(f) {
-    const key = d => d.slice(6) + d.slice(3, 5) + d.slice(0, 2);
-    return Object.keys(f.returns || {}).sort((a, b) => key(a).localeCompare(key(b))).map(d => ({
-      key: d === "30/09/2026" ? "2026 YTD" : d.slice(6),
-      date: d,
-      value: f.returns[d]
-    }));
+  function yearsOf(f) {
+    const dates = Object.keys(f.prices).sort();
+    const out = [];
+    for (let i = 1; i < dates.length; i++) {
+      const prev = f.prices[dates[i - 1]];
+      const cur = f.prices[dates[i]];
+      const label = dates[i].slice(6);
+      const ytd = dates[i] === "30/09/2026";
+      out.push({ key: ytd ? "2026 YTD" : label, ytd, value: (cur / prev - 1) * 100 });
+    }
+    return out;
   }
   function avg(rows) {
     if (!rows.length) return null;
@@ -65,7 +69,6 @@
 
   let sortKey = null;
   let sortDir = -1;
-  let chart = null;
 
   function bindSort(draw) {
     const table = $("grid");
@@ -82,7 +85,7 @@
   }
 
   function drawHeat() {
-    const rows = selectedFunds().map(f => ({ f, years: yearRows(f), avg: avg(yearRows(f)) }));
+    const rows = selectedFunds().map(f => ({ f, years: yearsOf(f), avg: avg(yearsOf(f)) }));
     const keys = [...new Set(rows.flatMap(r => r.years.map(y => y.key)))];
     if (sortKey) {
       rows.sort((a, b) => {
@@ -129,8 +132,9 @@
     bindSort(drawRolling);
   }
 
+  let chart;
   function drawCagr() {
-    let rows = selectedFunds().slice().sort((a, b) => b.cagr.cagr - a.cagr.cagr);
+    let rows = selectedFunds().slice().sort((a, b) => a.cagr.cagr - b.cagr.cagr);
     if (sortKey === "name") rows.sort((a, b) => a.name.localeCompare(b.name) * sortDir);
     else if (sortKey) rows.sort((a, b) => ((a.cagr[sortKey] ?? -999) - (b.cagr[sortKey] ?? -999)) * sortDir);
     if (chart) chart.destroy();
@@ -142,14 +146,14 @@
       },
       options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } } }
     });
-    const head = `<thead><tr><th class="left" data-k="name">Fund</th><th class="left" data-k="launch">Launch</th><th data-k="years">Years</th><th data-k="launchPrice">Launch price</th><th data-k="price">Price now</th><th data-k="cagr">CAGR</th></tr></thead>`;
+    const head = `<thead><tr><th class="left" data-k="name">Fund</th><th data-k="launch">Launch</th><th data-k="years">Years</th><th data-k="launchPrice">Launch price</th><th data-k="price">Price now</th><th data-k="cagr">CAGR</th></tr></thead>`;
     const body = rows.map(f => `<tr>${nameCell(f)}<td class="left">${f.cagr.launch}</td><td>${f.cagr.years.toFixed(2)}</td><td>£${f.cagr.launchPrice.toFixed(2)}</td><td>£${f.cagr.price.toFixed(2)}</td><td class="${cls(f.cagr.cagr)}">${pct(f.cagr.cagr)}</td></tr>`).join("");
     $("grid").innerHTML = head + `<tbody>${body}</tbody>`;
     bindSort(drawCagr);
   }
 
   function drawRpi() {
-    let rows = selectedFunds().slice().sort((a, b) => b.rpi.real - a.rpi.real);
+    let rows = selectedFunds().slice().sort((a, b) => a.rpi.real - b.rpi.real);
     if (sortKey) {
       rows.sort((a, b) => {
         const av = sortKey === "name" ? a.name : a.rpi[sortKey];
@@ -207,4 +211,6 @@
 
   const draw = { heatmap: drawHeat, rolling: drawRolling, cagr: drawCagr, rpi: drawRpi, markets: drawMarkets }[page];
   if (page !== "markets") fillFilters();
-  ["q","house","role","group"].forEach(id => $(id)?.addEventListener("input",
+  ["q","house","role","group"].forEach(id => $(id)?.addEventListener("input", draw));
+  draw();
+})();
